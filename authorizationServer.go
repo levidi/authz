@@ -11,14 +11,11 @@ import (
 	auth "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
 	envoy_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	"github.com/gogo/googleapis/google/rpc"
+	opa "github.com/levidi/authz/opa"
 	rpcstatus "google.golang.org/genproto/googleapis/rpc/status"
 )
 
 type authorizationServer struct{}
-
-func getStatusRPC(code rpc.Code) (status *rpcstatus.Status) {
-	return &rpcstatus.Status{Code: int32(code)}
-}
 
 func returnUnAuthenticated(message string) *auth.CheckResponse {
 	return &auth.CheckResponse{
@@ -68,7 +65,8 @@ func (a *authorizationServer) Check(ctx context.Context, req *auth.CheckRequest)
 	if errUn != nil {
 		fmt.Println(errUn)
 	}
-	log.Println(payload["profile"])
+	log.Println("PAYLOAD")
+	log.Println(payload)
 
 	b, err := json.Marshal(req.Attributes.Request.Http.Headers)
 	if err == nil {
@@ -76,13 +74,14 @@ func (a *authorizationServer) Check(ctx context.Context, req *auth.CheckRequest)
 		log.Println((string(b)))
 	}
 
-	if payload["profile"] == "admin" {
-
+	if opa.Eval(payload) {
+		log.Println("allow")
 		return &auth.CheckResponse{
-			Status: getStatusRPC(rpc.OK),
+			Status: &rpcstatus.Status{
+				Code: int32(rpc.OK),
+			},
 			HttpResponse: &auth.CheckResponse_OkResponse{
 				OkResponse: &auth.OkHttpResponse{
-
 					Headers: []*core.HeaderValueOption{
 						{
 							Header: &core.HeaderValue{
@@ -95,6 +94,6 @@ func (a *authorizationServer) Check(ctx context.Context, req *auth.CheckRequest)
 			},
 		}, nil
 	}
+	log.Println("NOT allow")
 	return returnPermissionDenied("Permission Denied"), nil
-
 }
