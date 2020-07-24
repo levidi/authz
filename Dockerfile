@@ -1,6 +1,6 @@
 FROM golang:1.14.4 as builder
 
-ENV GO111MODULE=on
+ENV GO111MODULE=on PATH_CONFIG_MAP=./configMap
 
 WORKDIR /app
 

@@ -1,0 +1,6 @@
+{
+    "namespace": "on-premise",
+    "nameConfigMap": "policy-config",
+    "regoRules": ["allow"],
+    "regoQueryName": "security"
+}
