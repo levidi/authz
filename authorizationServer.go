@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"reflect"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	auth "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
@@ -53,15 +52,9 @@ func returnPermissionDenied(message string) *auth.CheckResponse {
 
 func (a *authorizationServer) Check(ctx context.Context, req *auth.CheckRequest) (*auth.CheckResponse, error) {
 
-	headers := req.Attributes.Request.Http.Headers
-	log.Println(reflect.TypeOf(req.Attributes.Request.Http.Headers))
-	log.Println(headers["authorization"])
-
-	b, err := json.MarshalIndent(req.Attributes.Request.Http.Headers, "", "  ")
-	if err == nil {
-		log.Println("Inbound Headers: ")
-		log.Println((string(b)))
-	}
+	log.Println("START")
+	log.Println(req)
+	log.Println("END")
 
 	body := req.Attributes.Request.Http.Body
 
