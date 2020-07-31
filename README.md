@@ -1,6 +1,10 @@
 # authz
 Server for externalized authorization management
 
+```bash
+export PATH_CONFIG_MAP=./configMap
+```
+
 ## Run with Docker
 
 ```bash
